@@ -1,14 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Login - BiblioTech Cloud')
+@section('title', 'Connexion - BiblioTech')
 
 @section('content')
-<section class="container">
+<section class="bt-page-section">
+    <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-5">
             <div class="book-card p-4 p-lg-5">
-                <span class="text-primary fw-bold">Bienvenue</span>
-                <h1 class="section-title mb-4">Login</h1>
+                <span class="bt-label">Bienvenue</span>
+                <h1 class="section-title mb-4">Connexion</h1>
 
                 <form method="POST" action="{{ route('login.store') }}">
                     @csrf
@@ -29,9 +30,10 @@
                     <button class="btn btn-primary rounded-pill w-100 py-2" type="submit">Se connecter</button>
                 </form>
 
-                <p class="text-muted mt-4 mb-0">Pas encore membre ? <a href="{{ route('register') }}">Creer un compte</a></p>
+                <p class="text-muted mt-4 mb-0">Pas encore membre ? <a href="{{ route('register') }}">Créer un compte</a></p>
             </div>
         </div>
+    </div>
     </div>
 </section>
 @endsection

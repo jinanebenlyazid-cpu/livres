@@ -234,7 +234,7 @@
         <span class="bt-label">Commencer</span>
 
         <h2 class="bt-section-title mb-4">
-            Prêt à explorer votre <span>bibliothèque digitale ?</span>
+            Prêt à explorer votre <span class="text-white">bibliothèque digitale ?</span>
         </h2>
 
         <p class="bt-description mx-auto">

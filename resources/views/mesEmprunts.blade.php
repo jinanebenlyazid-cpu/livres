@@ -1,24 +1,25 @@
 @extends('layouts.app')
 
-@section('title', 'Mes emprunts - BiblioTech Cloud')
+@section('title', 'Mes emprunts - BiblioTech')
 
 @section('content')
-<section class="container">
+<section class="bt-page-section">
+    <div class="container">
     <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-end mb-4">
         <div>
-            <span class="text-primary fw-bold">Espace membre</span>
+            <span class="bt-label">Espace membre</span>
             <h1 class="section-title mb-0">Mes emprunts</h1>
         </div>
-        <a href="{{ route('livres.index') }}" class="btn btn-primary rounded-pill">Emprunter un livre</a>
+        <a href="{{ route('emprunts.create') }}" class="btn btn-primary rounded-pill px-4">Ajouter un emprunt</a>
     </div>
 
-    <div class="table-responsive book-card p-2">
+    <div class="table-responsive book-card p-2 bt-table-card">
         <table class="table align-middle mb-0">
             <thead>
                 <tr>
                     <th>Livre</th>
                     <th>Date emprunt</th>
-                    <th>Retour prevu</th>
+                    <th>Retour prévu</th>
                     <th>Statut</th>
                     <th class="text-end">Actions</th>
                 </tr>
@@ -37,10 +38,14 @@
                         </td>
                         <td>{{ $emprunt->date_emprunt->format('d/m/Y') }}</td>
                         <td>{{ $emprunt->date_retour_prevue->format('d/m/Y') }}</td>
-                        <td><span class="badge badge-status {{ $emprunt->statut === 'En cours' ? 'text-bg-primary' : 'text-bg-success' }}">{{ $emprunt->statut }}</span></td>
+                        <td>
+                            <span class="badge badge-status {{ $emprunt->statut === 'En retard' ? 'text-bg-warning' : ($emprunt->statut === 'En cours' ? 'text-bg-primary' : 'text-bg-success') }}">
+                                {{ $emprunt->statut }}
+                            </span>
+                        </td>
                         <td class="text-end">
-                            <div class="d-inline-flex gap-2">
-                                @if($emprunt->statut === 'En cours')
+                            <div class="d-inline-flex flex-wrap justify-content-end gap-2">
+                                @if(in_array($emprunt->statut, ['En cours', 'En retard'], true))
                                     <form method="POST" action="{{ route('emprunts.return', $emprunt) }}">
                                         @csrf
                                         @method('PATCH')
@@ -66,6 +71,7 @@
 
     <div class="mt-4">
         {{ $emprunts->links() }}
+    </div>
     </div>
 </section>
 @endsection

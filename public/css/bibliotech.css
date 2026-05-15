@@ -757,6 +757,213 @@ linear-gradient(
     font-size:.95rem;
 }
 
+/* INNER PAGES */
+
+.bt-page-section{
+    padding:70px 0 95px;
+    background:
+    linear-gradient(
+        180deg,
+        rgba(241,248,246,.88) 0%,
+        #fff 42%,
+        #fbfaf9 100%
+    );
+}
+
+.section-title{
+    font-size:clamp(2.1rem,4vw,3.5rem);
+    font-weight:800;
+    line-height:1.08;
+    letter-spacing:-.02em;
+    color:var(--text);
+}
+
+.book-card,
+.filter-panel,
+.stat-card{
+    background:rgba(255,255,255,.86);
+    border:1px solid var(--border);
+    border-radius:30px;
+    box-shadow:0 24px 70px rgba(15,139,141,.08);
+    backdrop-filter:blur(14px);
+}
+
+.book-card{
+    transition:.35s ease;
+}
+
+.book-card.fade-up:hover,
+.book-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 30px 80px rgba(15,139,141,.14);
+}
+
+.bt-table-card:hover,
+.book-card:has(form):hover{
+    transform:none;
+}
+
+.book-cover{
+    width:100%;
+    height:360px;
+    object-fit:cover;
+    border-radius:24px;
+    box-shadow:0 18px 45px rgba(17,24,39,.10);
+}
+
+.bt-detail-cover-card .book-cover{
+    height:520px;
+}
+
+.bt-back-link{
+    display:inline-flex;
+    align-items:center;
+    color:var(--primary);
+    font-weight:800;
+    text-decoration:none;
+    margin-bottom:8px;
+}
+
+.bt-back-link:hover{
+    color:var(--primary-dark);
+}
+
+.bt-book-summary{
+    background:linear-gradient(180deg,#fff 0%,#f6fbfa 100%);
+    border:1px solid var(--border);
+    border-radius:30px;
+    padding:30px;
+    box-shadow:0 24px 70px rgba(15,139,141,.08);
+}
+
+.bt-book-summary h2{
+    color:var(--text);
+    font-size:1.45rem;
+    font-weight:800;
+    margin-bottom:12px;
+}
+
+.bt-book-summary p{
+    color:var(--muted);
+    line-height:1.85;
+    margin-bottom:0;
+}
+
+.bt-summary-item{
+    height:100%;
+    background:white;
+    border:1px solid #ddebe8;
+    border-radius:22px;
+    padding:18px;
+}
+
+.bt-summary-item span{
+    display:block;
+    color:var(--muted);
+    font-size:.78rem;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+.bt-summary-item strong{
+    color:var(--primary);
+    font-weight:800;
+}
+
+.stat-card strong{
+    display:block;
+    color:var(--primary);
+    font-size:1.35rem;
+    font-weight:800;
+    overflow-wrap:anywhere;
+}
+
+.filter-panel .form-label,
+.bt-form .form-label{
+    color:var(--text);
+    font-weight:800;
+    font-size:.92rem;
+}
+
+.form-control,
+.form-select{
+    min-height:48px;
+    border-color:#ddebe8;
+    padding-left:18px;
+    font-weight:600;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 .22rem rgba(15,139,141,.14);
+}
+
+.bt-readonly-field{
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    padding:0 18px;
+    background:#f1f8f6;
+    border:1px solid #ddebe8;
+    color:var(--text);
+    font-weight:700;
+}
+
+.btn-outline-primary{
+    color:var(--primary);
+    border-color:var(--primary);
+    font-weight:800;
+}
+
+.btn-outline-primary:hover{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:white;
+    transform:translateY(-2px);
+}
+
+.table{
+    --bs-table-bg:transparent;
+}
+
+.table thead th{
+    color:var(--muted);
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    border-bottom:1px solid var(--border);
+}
+
+.table tbody td{
+    padding:18px 12px;
+    border-color:var(--border);
+}
+
+.badge-status{
+    border-radius:999px;
+    padding:9px 13px;
+}
+
+.pagination{
+    gap:8px;
+}
+
+.page-link{
+    border-radius:999px !important;
+    border-color:var(--border);
+    color:var(--primary);
+    font-weight:800;
+}
+
+.active>.page-link,
+.page-link.active{
+    background:var(--primary);
+    border-color:var(--primary);
+}
+
 
 @keyframes fadeUp{
     from{
@@ -831,8 +1038,7 @@ linear-gradient(
 @media(max-width:576px){
     .bt-hero-section,
     .bt-section{
-        padding:110px 0;
-}
+        padding:70px 0;
     }
 
     .bt-main-title{
@@ -858,5 +1064,22 @@ linear-gradient(
 
     .bt-category-card{
         padding:26px;
+    }
+
+    .bt-page-section{
+        padding:42px 0 70px;
+    }
+
+    .book-cover{
+        height:300px;
+    }
+
+    .bt-detail-cover-card .book-cover{
+        height:380px;
+    }
+
+    .bt-book-summary{
+        padding:24px;
+        border-radius:24px;
     }
 }

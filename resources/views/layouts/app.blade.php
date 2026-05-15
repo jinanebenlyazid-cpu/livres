@@ -43,12 +43,6 @@
                     </li>
 
                     @auth
-                        @if(auth()->user()->isAdmin())
-                            <li class="nav-item">
-                                <a class="nav-link" href="/admin">Admin</a>
-                            </li>
-                        @endif
-
                         <li class="nav-item dropdown">
                             <a class="btn btn-primary rounded-pill dropdown-toggle px-3" href="#" role="button" data-bs-toggle="dropdown">
                                 {{ auth()->user()->name }}
@@ -59,8 +53,18 @@
                                     <a class="dropdown-item" href="{{ route('profile') }}">Profil</a>
                                 </li>
 
+                                @if(auth()->user()->isAdmin())
+                                    <li>
+                                        <a class="dropdown-item" href="/admin">Admin</a>
+                                    </li>
+                                @endif
+
                                 <li>
                                     <a class="dropdown-item" href="{{ route('emprunts.index') }}">Mes emprunts</a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('emprunts.create') }}">Ajouter un emprunt</a>
                                 </li>
 
                                 <li><hr class="dropdown-divider"></li>

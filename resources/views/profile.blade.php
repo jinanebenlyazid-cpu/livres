@@ -1,14 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Profile - BiblioTech Cloud')
+@section('title', 'Profil - BiblioTech')
 
 @section('content')
-<section class="container">
+<section class="bt-page-section">
+    <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-7">
             <div class="book-card p-4 p-lg-5">
-                <span class="text-primary fw-bold">Compte</span>
-                <h1 class="section-title mb-4">Profile</h1>
+                <span class="bt-label">Compte</span>
+                <h1 class="section-title mb-4">Profil</h1>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="stat-card p-3">
@@ -24,7 +25,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="stat-card p-3">
-                            <span class="small text-muted d-block">Role</span>
+                            <span class="small text-muted d-block">Rôle</span>
                             <strong>{{ $user->role }}</strong>
                         </div>
                     </div>
@@ -35,9 +36,15 @@
                         </div>
                     </div>
                 </div>
-                <a href="{{ route('emprunts.index') }}" class="btn btn-primary rounded-pill mt-4">Voir mes emprunts</a>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a href="{{ route('emprunts.index') }}" class="btn btn-primary rounded-pill px-4">Voir mes emprunts</a>
+                    @if($user->isAdmin())
+                        <a href="/admin" class="btn btn-outline-primary rounded-pill px-4">Admin</a>
+                    @endif
+                </div>
             </div>
         </div>
+    </div>
     </div>
 </section>
 @endsection

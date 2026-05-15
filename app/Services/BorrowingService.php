@@ -27,6 +27,14 @@ class BorrowingService
                 ]);
             }
 
+            $emprunt = Emprunt::create([
+                'livre_id' => $book->id,
+                'user_id' => $user->id,
+                'date_emprunt' => $borrowDate ?? now()->toDateString(),
+                'date_retour_prevue' => $expectedReturnDate ?? now()->addDays(14)->toDateString(),
+                'statut' => $status ?: Emprunt::STATUT_EN_COURS,
+            ]);
+
             $book->decrement('nombre_exemplaires');
             $book->refresh();
 
@@ -34,13 +42,7 @@ class BorrowingService
                 $book->update(['statut' => Livre::STATUT_INDISPONIBLE]);
             }
 
-            return Emprunt::create([
-                'livre_id' => $book->id,
-                'user_id' => $user->id,
-                'date_emprunt' => $borrowDate ?? now()->toDateString(),
-                'date_retour_prevue' => $expectedReturnDate ?? now()->addDays(14)->toDateString(),
-                'statut' => $status ?: Emprunt::STATUT_EN_COURS,
-            ]);
+            return $emprunt;
         });
     }
 
@@ -49,7 +51,7 @@ class BorrowingService
         DB::transaction(function () use ($emprunt): void {
             $emprunt = Emprunt::whereKey($emprunt->id)->lockForUpdate()->firstOrFail();
 
-            if ($emprunt->statut !== Emprunt::STATUT_EN_COURS) {
+            if (! in_array($emprunt->statut, [Emprunt::STATUT_EN_COURS, Emprunt::STATUT_EN_RETARD], true)) {
                 return;
             }
 
@@ -63,7 +65,7 @@ class BorrowingService
         DB::transaction(function () use ($emprunt): void {
             $emprunt = Emprunt::whereKey($emprunt->id)->lockForUpdate()->firstOrFail();
 
-            if ($emprunt->statut === Emprunt::STATUT_EN_COURS) {
+            if (in_array($emprunt->statut, [Emprunt::STATUT_EN_COURS, Emprunt::STATUT_EN_RETARD], true)) {
                 $this->restoreBookCopy($emprunt);
             }
 
