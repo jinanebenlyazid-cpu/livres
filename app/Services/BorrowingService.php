@@ -10,9 +10,15 @@ use Illuminate\Validation\ValidationException;
 
 class BorrowingService
 {
-    public function borrow(User $user, Livre $livre, ?string $expectedReturnDate = null): Emprunt
+    public function borrow(
+        User $user,
+        Livre $livre,
+        ?string $expectedReturnDate = null,
+        ?string $borrowDate = null,
+        ?string $status = null
+    ): Emprunt
     {
-        return DB::transaction(function () use ($user, $livre, $expectedReturnDate): Emprunt {
+        return DB::transaction(function () use ($user, $livre, $expectedReturnDate, $borrowDate, $status): Emprunt {
             $book = Livre::whereKey($livre->id)->lockForUpdate()->firstOrFail();
 
             if (! $book->isAvailable()) {
@@ -31,9 +37,9 @@ class BorrowingService
             return Emprunt::create([
                 'livre_id' => $book->id,
                 'user_id' => $user->id,
-                'date_emprunt' => now()->toDateString(),
+                'date_emprunt' => $borrowDate ?? now()->toDateString(),
                 'date_retour_prevue' => $expectedReturnDate ?? now()->addDays(14)->toDateString(),
-                'statut' => Emprunt::STATUT_EN_COURS,
+                'statut' => $status ?: Emprunt::STATUT_EN_COURS,
             ]);
         });
     }

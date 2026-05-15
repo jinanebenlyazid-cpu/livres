@@ -22,7 +22,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 
     Route::get('/mes-emprunts', [EmpruntController::class, 'index'])->name('emprunts.index');
-    Route::post('/livres/{livre}/emprunter', [EmpruntController::class, 'store'])->name('emprunts.store');
+    Route::get('/emprunts/create', [EmpruntController::class, 'create'])->name('emprunts.create');
+    Route::post('/emprunts', [EmpruntController::class, 'store'])->name('emprunts.store');
+    Route::post('/livres/{livre}/emprunter', [EmpruntController::class, 'storeFromBook'])->name('emprunts.borrow');
     Route::patch('/emprunts/{emprunt}/retourner', [EmpruntController::class, 'returnBook'])->name('emprunts.return');
     Route::delete('/emprunts/{emprunt}', [EmpruntController::class, 'destroy'])->name('emprunts.destroy');
 });

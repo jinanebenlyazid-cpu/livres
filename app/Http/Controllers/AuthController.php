@@ -31,10 +31,6 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->isAdmin()) {
-            return redirect()->intended('/admin');
-        }
-
         return redirect()->intended(route('livres.index'));
     }
 

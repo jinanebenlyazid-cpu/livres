@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Emprunt;
 use App\Models\Livre;
+use App\Models\User;
 use App\Services\BorrowingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -23,23 +25,81 @@ class EmpruntController extends Controller
         return view('mesEmprunts', compact('emprunts'));
     }
 
-    public function store(Request $request, Livre $livre): RedirectResponse
+    public function create(Request $request): View
     {
+        return view('emprunts.create', [
+            'livres' => Livre::where('statut', Livre::STATUT_DISPONIBLE)
+                ->where('nombre_exemplaires', '>', 0)
+                ->orderBy('titre')
+                ->get(),
+            'membres' => $request->user()->isAdmin()
+                ? User::orderBy('name')->get()
+                : collect(),
+            'statuts' => [
+                Emprunt::STATUT_EN_COURS,
+                Emprunt::STATUT_RETOURNE,
+                Emprunt::STATUT_EN_RETARD,
+            ],
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $statuts = [
+            Emprunt::STATUT_EN_COURS,
+            Emprunt::STATUT_RETOURNE,
+            Emprunt::STATUT_EN_RETARD,
+        ];
+
+        $rules = [
+            'livre_id' => ['required', 'exists:livres,id'],
+            'date_emprunt' => ['required', 'date'],
+            'date_retour_prevue' => ['required', 'date', 'after_or_equal:date_emprunt'],
+            'statut' => ['nullable', Rule::in($statuts)],
+        ];
+
         if ($request->user()->isAdmin()) {
-            return back()->with('error', 'Les administrateurs gerent les emprunts depuis Filament.');
+            $rules['user_id'] = ['required', 'exists:users,id'];
         }
 
-        $alreadyBorrowed = Emprunt::where('user_id', $request->user()->id)
-            ->where('livre_id', $livre->id)
-            ->where('statut', Emprunt::STATUT_EN_COURS)
-            ->exists();
+        $data = $request->validate($rules);
+        $userId = $request->user()->isAdmin() ? $data['user_id'] : $request->user()->id;
+        $livre = Livre::findOrFail($data['livre_id']);
 
-        if ($alreadyBorrowed) {
+        if ($this->hasActiveBorrowing((int) $userId, $livre->id)) {
+            return back()
+                ->withInput()
+                ->with('error', 'Un emprunt en cours existe deja pour ce membre et ce livre.');
+        }
+
+        try {
+            app(BorrowingService::class)->borrow(
+                User::findOrFail($userId),
+                $livre,
+                $data['date_retour_prevue'],
+                $data['date_emprunt'],
+                $data['statut'] ?? Emprunt::STATUT_EN_COURS
+            );
+        } catch (ValidationException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors($exception->validator)
+                ->with('error', $exception->validator->errors()->first());
+        }
+
+        return redirect()->route('emprunts.index')->with('success', 'Emprunt cree avec succes.');
+    }
+
+    public function storeFromBook(Request $request, Livre $livre): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($this->hasActiveBorrowing($user->id, $livre->id)) {
             return back()->with('error', 'Vous avez deja un emprunt en cours pour ce livre.');
         }
 
         try {
-            app(BorrowingService::class)->borrow($request->user(), $livre);
+            app(BorrowingService::class)->borrow($user, $livre);
         } catch (ValidationException $exception) {
             return back()->with('error', $exception->validator->errors()->first());
         }
@@ -67,5 +127,13 @@ class EmpruntController extends Controller
         app(BorrowingService::class)->returnBook($emprunt);
 
         return back()->with('success', 'Livre retourne. Merci !');
+    }
+
+    private function hasActiveBorrowing(int $userId, int $livreId): bool
+    {
+        return Emprunt::where('user_id', $userId)
+            ->where('livre_id', $livreId)
+            ->where('statut', Emprunt::STATUT_EN_COURS)
+            ->exists();
     }
 }
