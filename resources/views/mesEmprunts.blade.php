@@ -49,13 +49,13 @@
                                     <form method="POST" action="{{ route('emprunts.return', $emprunt) }}">
                                         @csrf
                                         @method('PATCH')
-                                        <button class="btn btn-sm btn-accent rounded-pill" data-confirm="Confirmer le retour de ce livre ?">Retourner</button>
+                                        <button class="btn btn-sm btn-accent rounded-pill" data-confirm="Êtes-vous sûr de vouloir modifier cet emprunt ?">Retourner</button>
                                     </form>
                                 @endif
                                 <form method="POST" action="{{ route('emprunts.destroy', $emprunt) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger rounded-pill" data-confirm="Supprimer cet emprunt ?">Supprimer</button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill" data-confirm="Êtes-vous sûr de vouloir supprimer cet emprunt ?">Supprimer</button>
                                 </form>
                             </div>
                         </td>

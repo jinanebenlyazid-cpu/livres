@@ -1,10 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-confirm]').forEach((element) => {
-        element.addEventListener('click', (event) => {
-            if (! window.confirm(element.dataset.confirm)) {
-                event.preventDefault();
-            }
-        });
+    document.addEventListener('click', (event) => {
+        const element = event.target.closest('[data-confirm]');
+
+        if (! element) {
+            return;
+        }
+
+        if (! window.confirm(element.dataset.confirm)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
     });
 
     document.querySelectorAll('.fade-up').forEach((element, index) => {

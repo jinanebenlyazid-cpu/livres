@@ -25,62 +25,88 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('emprunts.store') }}" class="bt-form">
-                        @csrf
+                    @auth
+                        @if(auth()->user()->role === 'membre')
+                            <form method="POST" action="{{ route('emprunts.store') }}" class="bt-form">
+                                @csrf
 
-                        <div class="row g-4">
-                            <div class="col-12">
-                                <label for="livre_id" class="form-label">Livre</label>
-                                <select id="livre_id" name="livre_id" class="form-select rounded-pill @error('livre_id') is-invalid @enderror" required>
-                                    <option value="">Choisir un livre</option>
-                                    @foreach($livres as $livre)
-                                        <option value="{{ $livre->id }}" @selected(old('livre_id', request('livre_id')) == $livre->id)>
-                                            {{ $livre->titre }} - {{ $livre->auteur }} ({{ $livre->nombre_exemplaires }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('livre_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+                                <input type="hidden" name="statut" value="En cours">
 
-                            <div class="col-md-6">
-                                <label for="date_emprunt" class="form-label">Date d'emprunt</label>
-                                <input
-                                    type="date"
-                                    id="date_emprunt"
-                                    name="date_emprunt"
-                                    value="{{ old('date_emprunt', now()->toDateString()) }}"
-                                    class="form-control rounded-pill @error('date_emprunt') is-invalid @enderror"
-                                    required
-                                >
-                                @error('date_emprunt')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <label for="livre_id" class="form-label">Livre</label>
+                                        <select
+                                            id="livre_id"
+                                            name="livre_id"
+                                            class="form-select rounded-pill @error('livre_id') is-invalid @enderror"
+                                            required
+                                        >
+                                            <option value="">Choisir un livre</option>
+                                            @foreach($livres as $livre)
+                                                <option value="{{ $livre->id }}" @selected(old('livre_id', request('livre_id')) == $livre->id)>
+                                                    {{ $livre->titre }} - {{ $livre->auteur }} ({{ $livre->nombre_exemplaires }})
+                                                </option>
+                                            @endforeach
+                                        </select>
 
-                            <div class="col-md-6">
-                                <label for="date_retour_prevue" class="form-label">Date de retour prévue</label>
-                                <input
-                                    type="date"
-                                    id="date_retour_prevue"
-                                    name="date_retour_prevue"
-                                    value="{{ old('date_retour_prevue', now()->addDays(14)->toDateString()) }}"
-                                    class="form-control rounded-pill @error('date_retour_prevue') is-invalid @enderror"
-                                    required
-                                >
-                                @error('date_retour_prevue')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                        @error('livre_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
 
-                            <div class="col-12 d-flex align-items-end">
-                                <button class="btn btn-accent rounded-pill w-100 py-3" type="submit">
-                                    Enregistrer l'emprunt
-                                </button>
+                                    <div class="col-md-6">
+                                        <label for="date_emprunt" class="form-label">Date d'emprunt</label>
+                                        <input
+                                            type="date"
+                                            id="date_emprunt"
+                                            name="date_emprunt"
+                                            value="{{ old('date_emprunt', now()->toDateString()) }}"
+                                            max="{{ now()->toDateString() }}"
+                                            class="form-control rounded-pill @error('date_emprunt') is-invalid @enderror"
+                                            required
+                                        >
+
+                                        @error('date_emprunt')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="date_retour_prevue" class="form-label">Date de retour prévue</label>
+                                        <input
+                                            type="date"
+                                            id="date_retour_prevue"
+                                            name="date_retour_prevue"
+                                            value="{{ old('date_retour_prevue', now()->addDays(14)->toDateString()) }}"
+                                            min="{{ old('date_emprunt', now()->toDateString()) }}"
+                                            class="form-control rounded-pill @error('date_retour_prevue') is-invalid @enderror"
+                                            required
+                                        >
+
+                                        @error('date_retour_prevue')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button class="btn btn-accent rounded-pill w-100 py-3" type="submit">
+                                            Enregistrer l'emprunt
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        @else
+                            <div class="alert alert-warning rounded-4">
+                                Seuls les membres peuvent ajouter un emprunt depuis cette page.
                             </div>
+                        @endif
+                    @else
+                        <div class="alert alert-warning rounded-4">
+                            Connectez-vous comme membre pour ajouter un emprunt.
+                            <a href="{{ route('login') }}" class="fw-bold">Connexion</a>
                         </div>
-                    </form>
+                    @endauth
                 </div>
             </div>
         </div>

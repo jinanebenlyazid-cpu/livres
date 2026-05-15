@@ -25,6 +25,8 @@ class EmpruntController extends Controller
 
     public function create(Request $request): View
     {
+        abort_unless($request->user()->role === 'membre', 403);
+
         return view('emprunts.create', [
             'livres' => Livre::where('statut', Livre::STATUT_DISPONIBLE)
                 ->where('nombre_exemplaires', '>', 0)
@@ -35,9 +37,11 @@ class EmpruntController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        abort_unless($request->user()->role === 'membre', 403);
+
         $data = $request->validate([
             'livre_id' => ['required', 'exists:livres,id'],
-            'date_emprunt' => ['required', 'date'],
+            'date_emprunt' => ['required', 'date', 'before_or_equal:today'],
             'date_retour_prevue' => ['required', 'date', 'after_or_equal:date_emprunt'],
         ]);
 

@@ -63,12 +63,13 @@
 
                     @auth
                         @if(auth()->user()->role === 'membre')
-                            <form method="POST" action="{{ route('emprunts.borrow', $livre) }}">
-                                @csrf
-                                <button class="btn btn-accent btn-lg  rounded-pill px-5" type="submit" @disabled(! $livre->isAvailable())>
+                            <a
+                                href="{{ route('emprunts.create', ['livre_id' => $livre->id]) }}"
+                                class="btn btn-accent btn-lg rounded-pill px-5 @if(! $livre->isAvailable()) disabled @endif"
+                                @if(! $livre->isAvailable()) aria-disabled="true" tabindex="-1" @endif
+                            >
                                     Emprunter ce livre
-                                </button>
-                            </form>
+                            </a>
                         @else
                             <div class="d-flex  flex-wrap gap-2">
                                 <a href="{{ route('emprunts.create', ['livre_id' => $livre->id]) }}" class="btn btn-accent btn-lg rounded-pill px-5">
