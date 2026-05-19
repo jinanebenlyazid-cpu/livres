@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Emprunt;
 use App\Models\Livre;
+use App\Models\User;
 use App\Services\BorrowingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class EmpruntController extends Controller
@@ -25,27 +27,41 @@ class EmpruntController extends Controller
 
     public function create(Request $request): View
     {
-        abort_unless($request->user()->role === 'membre', 403);
+        $user = $request->user();
 
         return view('emprunts.create', [
             'livres' => Livre::where('statut', Livre::STATUT_DISPONIBLE)
                 ->where('nombre_exemplaires', '>', 0)
                 ->orderBy('titre')
                 ->get(),
+            'membres' => $user->isAdmin()
+                ? User::where('role', 'membre')->orderBy('name')->get()
+                : collect(),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        abort_unless($request->user()->role === 'membre', 403);
+        $authenticatedUser = $request->user();
 
-        $data = $request->validate([
+        $rules = [
             'livre_id' => ['required', 'exists:livres,id'],
             'date_emprunt' => ['required', 'date', 'before_or_equal:today'],
             'date_retour_prevue' => ['required', 'date', 'after_or_equal:date_emprunt'],
-        ]);
+        ];
 
-        $user = $request->user();
+        if ($authenticatedUser->isAdmin()) {
+            $rules['user_id'] = [
+                'required',
+                Rule::exists('users', 'id')->where(fn ($query) => $query->where('role', 'membre')),
+            ];
+        }
+
+        $data = $request->validate($rules);
+
+        $user = $authenticatedUser->isAdmin()
+            ? User::findOrFail($data['user_id'])
+            : $authenticatedUser;
         $livre = Livre::findOrFail($data['livre_id']);
 
         if ($this->hasActiveBorrowing($user->id, $livre->id)) {
